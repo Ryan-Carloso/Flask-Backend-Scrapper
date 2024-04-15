@@ -1,30 +1,22 @@
-from flask import Flask, render_template, request
+from flask import Flask, jsonify
 from bs4 import BeautifulSoup
 import requests
 
 app = Flask(__name__)
 
-# Rota principal
-@app.route('/')
-def index():
-    # Obter o número da questão da query string, ou 0 se não estiver presente
-    question_number = int(request.args.get('numero', 1))
-
+# Função para realizar o scraping
+def scrape_question(question_number):
     # Construir a URL da página a ser scrapada com base no número da questão
     url = f"https://www.bomcondutor.pt/questao/{question_number}"
-
     # Enviar uma requisição GET para a página
     response = requests.get(url)
-
     # Verificar se a requisição foi bem-sucedida (código de status 200)
     if response.status_code == 200:
         # Parsear o conteúdo da página usando BeautifulSoup
         soup = BeautifulSoup(response.text, 'html.parser')
-
         # Encontrar o elemento com a classe 'question-text'
         question_text_element = soup.find(class_="question-text")
         question_text = question_text_element.get_text(strip=True) if question_text_element else "Nenhum elemento com a classe 'question-text' encontrado."
-
         # Encontrar o elemento com a classe 'answers'
         answers_element = soup.find(class_="answers")
         if answers_element:
@@ -53,13 +45,24 @@ def index():
             # Se nenhum elemento com a classe 'answers' for encontrado, definir uma mensagem de resposta padrão
             answer_texts = ["Nenhum elemento com a classe 'answers' encontrado."]
             correct_answer = "Nenhuma resposta correta encontrada."
-
         # URL da imagem
         image_url = f"https://www.bomcondutor.pt/assets/images/questions/{question_number}.jpg"
-
-        return render_template('template.html', question_text=question_text, answer_texts=answer_texts, correct_answer=correct_answer, image_url=image_url, question_number=question_number)
+        return {
+            "question_text": question_text,
+            "answer_texts": answer_texts,
+            "correct_answer": correct_answer,
+            "image_url": image_url,
+            "question_number": question_number
+        }
     else:
-        return "Erro ao acessar a página:", response.status_code
+        return {"error": f"Erro ao acessar a página: {response.status_code}"}
+
+# Rota para realizar o scraping e retornar os resultados em JSON
+@app.route('/scrape')
+def scrape():
+    question_number = int(request.args.get('numero', 1))
+    scraped_data = scrape_question(question_number)
+    return jsonify(scraped_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
