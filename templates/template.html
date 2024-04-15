@@ -1,0 +1,82 @@
+<!-- template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraper Flask App</title>
+    <style>
+        .container {
+            max-width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conteúdo da Página</h1>
+        <img src="{{ image_url }}" alt="Imagem da pergunta">
+        <h2>Pergunta:</h2>
+        <p>{{ question_text }}</p>
+        <h2>Respostas:</h2>
+        <ul>
+        {% for answer_text in answer_texts %}
+            <li>{{ answer_text }}</li>
+        {% endfor %}
+        </ul>
+        <h2>Resposta Correta:</h2>
+        <p>{{ correct_answer }}</p>
+        <button onclick="redirectToPage('{{ redirect_url }}')">Ir para a página</button>
+        <button onclick="incrementQuestion('{{ question_number }}')">Próxima Questão</button>
+    </div>
+
+    <script>
+        function redirectToPage(url) {
+            window.location.href = url;
+        }
+        function incrementQuestion(currentQuestion) {
+            var nextQuestion = parseInt(currentQuestion) + 1;
+            window.location.href = "/?numero=" + nextQuestion;
+        }
+    </script>
+</body>
+</html>
