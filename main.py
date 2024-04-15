@@ -61,7 +61,7 @@ def scrape_question(question_number):
 # Rota para realizar o scraping e retornar os resultados em JSON
 @app.route('/scrape')
 def scrape():
-    question_number = int(request.args.get('numero', 1))
+    question_number = int(requests.args.get('numero', 1))
     scraped_data = scrape_question(question_number)
     return jsonify(scraped_data)
 
